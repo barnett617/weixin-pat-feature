@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>微信网页版</title>
+  <style>
+    *{box-sizing:border-box;}html,body{margin:0;padding:0;height:100%}.app{margin:auto;margin-top:100px;width:830px;height:769px;display:flex;border-radius:10px;border:1px solid rgb(209,209,209);overflow:hidden;}.app>.side-bar{width:70px;height:100%;background-color:rgb(76,76,76);}.app>.chat-list{width:260px;height:100%;background-color:rgb(241,241,241);}.app>.chat-content{width:500px;height:100%;display:flex;flex-direction:column;border-left:1px solid rgb(229,229,229);}.app>.chat-content>.chat-content-header{width:100%;height:60px;background-color:rgb(242,242,242);border-bottom:rgb(230,230,230) 1px solid;display:flex;justify-content:space-between;padding-top:20px;padding-bottom:26px;}.app>.chat-content>.chat-content-main{flex:1;width:100%;background-color:rgb(243,243,243);display:flex;flex-direction:column;}.app>.chat-content>.chat-content-input{height:156px;width:100%;background-color:rgb(243,243,243);border-top:1px solid rgb(226,226,226);}.app>.chat-content>.chat-content-header>.chat-content-header-title{color:rgb(42,42,42);font-size:14px;line-height:16px;font-weight:600;padding-left:20px;}.app>.chat-content>.chat-content-header>.chat-content-header-setting{display:flex;justify-content:center;align-items:center;padding-right:10px;}.black-dot{width:4px;height:4px;border-radius:50%;background-color:rgb(25,24,25);}.black-dot:not(:last-child){margin-right:3px;}.app>.chat-content>.chat-content-main>.msg-common{height:50px;width:100%;}.app>.chat-content>.chat-content-main>div{margin:5px 0;}.msg-system-timestamp{color:rgb(178,178,178);font-size:12px;text-align:center;}.msg-system-tap{color:rgb(183,183,183);font-size:12px;text-align:center;}.msg-img{background-repeat:no-repeat;background-position:center center;background-size:auto 100%;}.msg-wrap-other{display:flex;padding-top:10px;padding-left:20px;}.msg-wrap-other>img{width:25px;height:25px;border-radius:2px;}.msg-wrap-other .msg-username{font-size:0.65em;font-weight:500;color:rgb(193,193,193);padding-left:8px;}.msg-other-right>img{display:inline-block;margin-top:10px;width:114px;height:114px;}.msg-wrap-self{display:flex;padding-top:10px;padding-right:20px;align-self:flex-end;}.msg-wrap-self>img{width:25px;height:25px;border-radius:2px;}.msg-wrap-self>span{position:relative;background-color:rgb(170,232,122);padding:6px 12px;border-radius:4px;font-size:12px;margin-right:12px;}.msg-wrap-self>span:after{position:absolute;top:48%;transform:translateY(-50%);right:-10px;content:'';border-color:transparent;border-style:solid;border-width:5px;border-left-color:rgb(170,232,122);border-left-width:5px;}.avatar-common{cursor:pointer;}
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="side-bar"></div>
+    <div class="chat-list"></div>
+    <div class="chat-content">
+      <div class="chat-content-header">
+        <div id="chat-content-title" class="chat-content-header-title"></div>
+        <div class="chat-content-header-setting">
+          <div class="black-dot"></div>
+          <div class="black-dot"></div>
+          <div class="black-dot"></div>
+        </div>
+      </div>
+      <div id="chat-content" class="chat-content-main"></div>
+      <div class="chat-content-input"></div>
+    </div>
+  </div>
+</body>
+<script>
+  function renderChatContentTitle(e){document.getElementById("chat-content-title").innerText=e}function genOtherMsg(e){const t=document.createElement("div");t.setAttribute("class","msg-wrap-other");const n=document.createElement("img");n.setAttribute("src",e.avatar),n.setAttribute("data-username",e.username),n.setAttribute("data-tapmsg",e.tapMsg),n.setAttribute("class","avatar-common"),t.appendChild(n);const a=document.createElement("div");a.setAttribute("class","msg-other-right");const s=document.createElement("div");if(s.innerText=e.username,s.setAttribute("class","msg-username"),a.appendChild(s),"img"===e.type){const t=document.createElement("img");t.setAttribute("src",e.content),a.appendChild(t)}else if("text"===e.type){const e=document.createElement("div");e.setAttribute("class","msg-other"),a.appendChild(e)}return t.appendChild(a),t}function genSelfMsg(e){const t=document.createElement("div");if(t.setAttribute("class","msg-wrap-self"),"img"===e.type){const n=document.createElement("img");n.setAttribute("src",e.content),t.appendChild(n)}else if("text"===e.type){const n=document.createElement("span");n.innerText=e.content,t.appendChild(n)}const n=document.createElement("img");return n.setAttribute("src",e.avatar),n.setAttribute("data-username",e.username),n.setAttribute("data-tapmsg",e.tapMsg),n.setAttribute("class","avatar-common"),t.appendChild(n),t}function genUserMsgDomByType(e){let t;return t=e.username===currentUser?genSelfMsg(e):genOtherMsg(e)}function genTimeMsgDom(e){const t=document.createElement("div");return t.innerText=e.content,t.setAttribute("class","msg-system-timestamp"),t}function genTapMsgDom(e){const t=document.createElement("div");return t.innerText=e.content,t.setAttribute("class","msg-system-tap"),t}function renderChatContent(e){const t=e.map(e=>{let t;return t="timestamp"===e.type?genTimeMsgDom(e):genUserMsgDomByType(e)}),n=document.getElementById("chat-content");t.forEach(e=>{n.appendChild(e)})}function bindAvatarEvent(){document.querySelectorAll(".avatar-common").forEach(e=>{e.addEventListener("click",handleAvatarClickWrapper)})}function handleAvatarClickWrapper(e){if(window.doubleTap){if(!window.lock)return window.lock=!0,setTimeout(()=>{window.lock=!1},1e4),handleAvatarClick.call(this,e);{const e=window.confirm("撤回刚才这次拍一拍?");console.log("answer",e),e&&(window.lock=!1,clearLastTap())}}else window.doubleTap=!0,setTimeout(()=>{window.doubleTap=!1},500)}function clearLastTap(){const e=document.getElementById("chat-content"),t=document.querySelectorAll(".msg-system-tap");e.removeChild(t[t.length-1])}function handleAvatarClick(e){const{username:t,tapmsg:n}=e.target.dataset;let a="";a=t===currentUser?"我拍了拍自己":`我拍了拍"${t}"`,n&&(a+=`说${n}`),addNewSystemMsg(a)}function addNewSystemMsg(e){const t=document.getElementById("chat-content"),n=genTapMsgDom({username:"system",type:"tap",content:e});t.appendChild(n)}function setup(){window.currentUser="wilson",renderChatContentTitle("鑫仔亲友团(7)");renderChatContent([{avatar:"https://user-images.githubusercontent.com/23159565/127432393-8171b70d-cc4a-4454-adab-1dcb010f4f52.jpeg",username:"卷卷星",type:"img",content:"https://user-images.githubusercontent.com/23159565/127431269-a33af7aa-974f-4ab8-8dc4-4d7fc3a50eab.png",tapMsg:"来钓鱼🎣"},{username:"system",type:"timestamp",content:"11:05"},{avatar:"https://user-images.githubusercontent.com/23159565/127432445-57fa5223-9002-4dc1-b557-1ec2710f65ee.jpeg",username:"wilson",type:"text",content:"开始做拍一拍",tapMsg:""}]),bindAvatarEvent()}setup();
+</script>
+
+</html>
